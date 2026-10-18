@@ -1,0 +1,22 @@
+Subject: [PATCH] statically link libstdc++ and libgcc
+
+As a host tool, patchelf runs directly on the build machine rather
+than through any sysroot or RPATH Buildroot sets up for target
+binaries, so it depends on the build machine having a dynamic
+libstdc++.so.6 on its default linker search path. NixOS doesn't put
+shared libraries there at all — every path is a hashed store path —
+so the freshly built host-patchelf binary fails with "error while
+loading shared libraries: libstdc++.so.6: cannot open shared object
+file". Link libstdc++ and libgcc statically so the binary doesn't
+depend on finding them at runtime.
+
+--- a/src/Makefile.in
++++ b/src/Makefile.in
+@@ -264,7 +264,7 @@
+ top_build_prefix = @top_build_prefix@
+ top_builddir = @top_builddir@
+ top_srcdir = @top_srcdir@
+-AM_CXXFLAGS = -Wall -std=c++11 -D_FILE_OFFSET_BITS=64 $(am__append_1)
++AM_CXXFLAGS = -Wall -std=c++11 -D_FILE_OFFSET_BITS=64 -static-libstdc++ -static-libgcc $(am__append_1)
+ patchelf_SOURCES = patchelf.cc elf.h
+ all: all-am
