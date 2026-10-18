@@ -1,0 +1,17 @@
+Subject: [PATCH] tools: use /usr/bin/env bash shebangs
+
+Buildroot's host build environment doesn't guarantee /bin/bash exists
+(it doesn't on NixOS, which only has bash on PATH). These scripts
+aren't part of the target build, just host-side codegen helpers, so
+switching to an env lookup is safe.
+
+--- a/tools/all_syscalls
++++ b/tools/all_syscalls
+@@ -1 +1 @@
+-#!/bin/bash
++#!/usr/bin/env bash
+--- a/tools/all_errnos
++++ b/tools/all_errnos
+@@ -1 +1 @@
+-#!/bin/bash
++#!/usr/bin/env bash

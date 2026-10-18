@@ -1,0 +1,17 @@
+Subject: [PATCH] Makefile: exit, don't return, from filechk_timestamp.h
+
+filechk_timestamp.h's shell script runs as a Makefile recipe line, not
+inside a shell function, so `return` outside a function makes dash
+(NixOS's /bin/sh) fail the build with "return: can only `return' from
+a function or sourced script". Use `exit` instead, which works the
+same way here since this is the last command run by the subshell.
+
+--- a/Makefile
++++ b/Makefile
+@@ -2330,5 +2330,5 @@
+ 			LC_ALL=C $${DATE} -u -d "$${SOURCE_DATE}" +'#define U_BOOT_EPOCH %s'; \
+ 		else \
+-			return 42; \
++			exit 42; \
+ 		fi; \
+ 	else \
